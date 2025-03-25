@@ -1,12 +1,12 @@
-import { JSX, useState } from 'react';
+import React from 'react';
 import styles from './Navbar.module.css';
 
 interface NavbarProps {
   onNavigate: (section: string) => void;
 }
 
-export default function Navbar({ onNavigate }: NavbarProps): JSX.Element {
-  const [activeSection, setActiveSection] = useState('theory');
+const Navbar: React.FC<NavbarProps> = ({ onNavigate }) => {
+  const [activeSection, setActiveSection] = React.useState('theory');
 
   const handleNavigation = (section: string) => {
     setActiveSection(section);
@@ -16,34 +16,42 @@ export default function Navbar({ onNavigate }: NavbarProps): JSX.Element {
   return (
     <nav className={styles.navbar}>
       <div className={styles.container}>
-        <h1 className={styles.title}>Statistical Hypothesis Testing</h1>
-        <div className={styles.buttonGroup}>
+        <a href="/" className={styles.logo}>
+          <span>📊</span> StatLearn
+        </a>
+        
+        <div className={styles.nav}>
           <button
-            className={`${styles.button} ${activeSection === 'theory' ? styles.activeButton : ''}`}
+            className={`${styles.navItem} ${activeSection === 'theory' ? styles.active : ''}`}
             onClick={() => handleNavigation('theory')}
           >
-            Theory
+            Teorie
           </button>
+          
           <button
-            className={`${styles.button} ${activeSection === 'examples' ? styles.activeButton : ''}`}
+            className={`${styles.navItem} ${activeSection === 'examples' ? styles.active : ''}`}
             onClick={() => handleNavigation('examples')}
           >
-            Examples
+            Příklady
           </button>
+          
           <button
-            className={`${styles.button} ${activeSection === 'practice' ? styles.activeButton : ''}`}
+            className={`${styles.navItem} ${activeSection === 'practice' ? styles.active : ''}`}
             onClick={() => handleNavigation('practice')}
           >
-            Practice
+            Cvičení
           </button>
+          
           <button
-            className={`${styles.button} ${activeSection === 'flowcharts' ? styles.activeButton : ''}`}
+            className={`${styles.navItem} ${activeSection === 'flowcharts' ? styles.active : ''}`}
             onClick={() => handleNavigation('flowcharts')}
           >
-            Flowcharts
+            Diagramy
           </button>
         </div>
       </div>
     </nav>
   );
-} 
+};
+
+export default Navbar; 

@@ -1,36 +1,82 @@
 .navbar {
-  background-color: #2563eb;  /* equivalent to bg-blue-600 */
-  color: white;
-  padding: 1rem;  /* equivalent to p-4 */
+  background: white;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .container {
-  max-width: 1280px;  /* equivalent to container */
+  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.title {
-  font-size: 1.25rem;  /* equivalent to text-xl */
-  font-weight: bold;
-}
-
-.buttonGroup {
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2D3748;
+  text-decoration: none;
   display: flex;
-  gap: 1rem;  /* equivalent to space-x-4 */
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.button {
-  padding: 0.5rem 1rem;  /* equivalent to px-4 py-2 */
-  border-radius: 0.25rem;  /* equivalent to rounded */
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
+.logo:hover {
+  color: #4299E1;
 }
 
-.activeButton {
-  background-color: #1d4ed8;  /* equivalent to bg-blue-700 */
+.nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.navItem {
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  color: #4A5568;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.navItem:hover {
+  color: #2B6CB0;
+  background: #EBF8FF;
+}
+
+.navItem.active {
+  color: #2B6CB0;
+  background: #EBF8FF;
+}
+
+.navItem.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  background: #4299E1;
+  border-radius: 2px;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1rem;
+  }
+
+  .nav {
+    gap: 0.5rem;
+  }
+
+  .navItem {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
 } 
