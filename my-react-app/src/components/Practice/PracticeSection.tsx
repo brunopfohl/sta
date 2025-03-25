@@ -218,6 +218,28 @@ const PracticeSection: React.FC<PracticeSectionProps> = ({ practices }) => {
     return categoryPractices.filter(p => !problematicIds.includes(p.id)).length;
   };
 
+  // Toggle completion status for a category
+  const handleToggleCategoryCompletion = (e: React.MouseEvent, category: string) => {
+    e.stopPropagation(); // Prevent clicking on the category item
+    
+    if (completedCategories.has(category)) {
+      // Remove from completed categories
+      const updatedCompletedCategories = new Set([...completedCategories]);
+      updatedCompletedCategories.delete(category);
+      setCompletedCategories(updatedCompletedCategories);
+      
+      // Save to localStorage
+      localStorage.setItem('completedCategories', JSON.stringify([...updatedCompletedCategories]));
+    } else {
+      // Add to completed categories
+      const updatedCompletedCategories = new Set([...completedCategories, category]);
+      setCompletedCategories(updatedCompletedCategories);
+      
+      // Save to localStorage
+      localStorage.setItem('completedCategories', JSON.stringify([...updatedCompletedCategories]));
+    }
+  };
+
   // Render the problematic questions list
   if (showProblematicList) {
     return (
@@ -280,6 +302,9 @@ const PracticeSection: React.FC<PracticeSectionProps> = ({ practices }) => {
         <p className={styles.roadmapDescription}>
           Procházejte kategorie od základních konceptů k pokročilejším. 
           Již dokončené kategorie jsou označeny jako splněné.
+          <span className={styles.manualCompletionHint}>
+            Tip: Kategorie můžete označit jako dokončené i manuálně kliknutím na kruhové tlačítko.
+          </span>
         </p>
         
         <div className={styles.overallProgressContainer}>
@@ -318,9 +343,24 @@ const PracticeSection: React.FC<PracticeSectionProps> = ({ practices }) => {
                 <div className={styles.roadmapNumber}>{index + 1}</div>
                 <div className={styles.roadmapContent}>
                   <h3 className={styles.roadmapCategory}>{category}</h3>
-                  <p className={styles.roadmapStatus}>
-                    {completedCategories.has(category) ? 'Dokončeno ✓' : 'Nedokončeno'}
-                  </p>
+                  <div className={styles.roadmapStatusContainer}>
+                    <p className={styles.roadmapStatus}>
+                      {completedCategories.has(category) ? 'Dokončeno ✓' : 'Nedokončeno'}
+                    </p>
+                    <button 
+                      className={`${styles.manualCompleteButton} ${completedCategories.has(category) ? styles.completed : ''}`}
+                      onClick={(e) => handleToggleCategoryCompletion(e, category)}
+                      title={completedCategories.has(category) ? "Označit jako nedokončené" : "Označit jako dokončené manuálně"}
+                      aria-label={completedCategories.has(category) ? "Označit jako nedokončené" : "Označit jako dokončené manuálně"}
+                    >
+                      <span className={styles.checkmarkIcon}>
+                        {completedCategories.has(category) ? '✓' : ''}
+                      </span>
+                      <span className={styles.buttonTooltip}>
+                        {completedCategories.has(category) ? 'Zrušit označení' : 'Označit jako dokončené'}
+                      </span>
+                    </button>
+                  </div>
                   <div className={styles.roadmapCount}>
                     {nonProblematicCount} otázek
                     {problematicCount > 0 && (
