@@ -1,0 +1,72 @@
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.content {
+  max-width: none;
+}
+
+.testsSection {
+  margin-top: 2rem;
+}
+
+.testsTitle {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.testCard {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+}
+
+.testName {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.testDescription {
+  margin-bottom: 1rem;
+}
+
+.formulaSection {
+  background-color: #f9fafb;
+  padding: 1rem;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+}
+
+.sectionTitle {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.formula {
+  display: block;
+  white-space: pre-wrap;
+}
+
+.list {
+  list-style-position: inside;
+  padding-left: 1.25rem;
+}
+
+.listDecimal {
+  list-style-type: decimal;
+}
+
+.listDisc {
+  list-style-type: disc;
+} 
