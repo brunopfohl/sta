@@ -23,6 +23,7 @@ export interface Practice {
   correctAnswer: string;
   explanation: string;
   type: 'multiple-choice' | 'calculation' | 'theory';
+  category: string;
 }
 
 export interface Chapter {

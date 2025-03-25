@@ -12,9 +12,18 @@ const PracticeSection: React.FC<PracticeSectionProps> = ({ practices }) => {
   const [showExplanation, setShowExplanation] = useState(false);
   const [score, setScore] = useState(0);
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<number>>(new Set());
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  const currentQuestion = practices[currentQuestionIndex];
-  const progress = (answeredQuestions.size / practices.length) * 100;
+  // Get unique categories
+  const categories = ['all', ...new Set(practices.map(p => p.category))];
+  
+  // Filter questions by category
+  const filteredPractices = selectedCategory === 'all' 
+    ? practices 
+    : practices.filter(p => p.category === selectedCategory);
+
+  const currentQuestion = filteredPractices[currentQuestionIndex];
+  const progress = (answeredQuestions.size / filteredPractices.length) * 100;
 
   const handleAnswerSelect = (answer: string) => {
     if (answeredQuestions.has(currentQuestionIndex)) return;
@@ -30,7 +39,7 @@ const PracticeSection: React.FC<PracticeSectionProps> = ({ practices }) => {
   };
 
   const handleNextQuestion = () => {
-    if (currentQuestionIndex < practices.length - 1) {
+    if (currentQuestionIndex < filteredPractices.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
       setSelectedAnswer(null);
       setShowExplanation(false);
@@ -43,6 +52,15 @@ const PracticeSection: React.FC<PracticeSectionProps> = ({ practices }) => {
       setSelectedAnswer(null);
       setShowExplanation(false);
     }
+  };
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    setCurrentQuestionIndex(0);
+    setSelectedAnswer(null);
+    setShowExplanation(false);
+    setScore(0);
+    setAnsweredQuestions(new Set());
   };
 
   const getOptionClassName = (option: string) => {
@@ -63,6 +81,22 @@ const PracticeSection: React.FC<PracticeSectionProps> = ({ practices }) => {
 
   return (
     <div className={styles.practiceContainer}>
+      <div className={styles.categorySelector}>
+        <label htmlFor="category">Vyberte kategorii:</label>
+        <select 
+          id="category"
+          value={selectedCategory}
+          onChange={(e) => handleCategoryChange(e.target.value)}
+          className={styles.categorySelect}
+        >
+          {categories.map(category => (
+            <option key={category} value={category}>
+              {category === 'all' ? 'Všechny kategorie' : category}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div className={styles.progressBar}>
         <div 
           className={styles.progressFill} 
@@ -71,12 +105,17 @@ const PracticeSection: React.FC<PracticeSectionProps> = ({ practices }) => {
       </div>
       
       <div className={styles.score}>
-        Skóre: {score} / {practices.length}
+        Skóre: {score} / {filteredPractices.length}
       </div>
 
       <div className={styles.questionCard}>
-        <div className={styles.questionType}>
-          {currentQuestion.type === 'multiple-choice' ? 'Výběr z možností' : 'Teoretická otázka'}
+        <div className={styles.questionMeta}>
+          <div className={styles.questionType}>
+            {currentQuestion.type === 'multiple-choice' ? 'Výběr z možností' : 'Teoretická otázka'}
+          </div>
+          <div className={styles.questionCategory}>
+            {currentQuestion.category}
+          </div>
         </div>
         
         <h3 className={styles.questionHeader}>
@@ -99,7 +138,10 @@ const PracticeSection: React.FC<PracticeSectionProps> = ({ practices }) => {
         )}
 
         {currentQuestion.type === 'theory' && (
-          <div className={styles.theoryAnswer}>
+          <div 
+            className={styles.theoryAnswer}
+            onClick={() => !answeredQuestions.has(currentQuestionIndex) && handleAnswerSelect(currentQuestion.correctAnswer)}
+          >
             {showExplanation ? currentQuestion.correctAnswer : 'Klikněte pro zobrazení odpovědi'}
           </div>
         )}
@@ -122,7 +164,7 @@ const PracticeSection: React.FC<PracticeSectionProps> = ({ practices }) => {
           <button
             className={styles.navButton}
             onClick={handleNextQuestion}
-            disabled={currentQuestionIndex === practices.length - 1}
+            disabled={currentQuestionIndex === filteredPractices.length - 1}
           >
             Další →
           </button>
