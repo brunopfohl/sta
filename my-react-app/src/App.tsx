@@ -7,6 +7,7 @@ import PracticeSection from './components/Practice/PracticeSection'
 import FlowchartSection from './components/Flowcharts/FlowchartSection'
 import { Chapter, Example, Practice } from './types'
 import { cviceni1Questions, cviceni2Questions, apstaPrednasky, testyHypotezPriklady } from './data/practiceQuestions'
+import { twoChoicePracticeQuestions } from './data/questions/2choice'
 
 // Sample data - replace with actual content from your materials
 const sampleChapter: Chapter = {
@@ -81,7 +82,8 @@ const allPractices: Practice[] = [
   ...cviceni1Questions,
   ...cviceni2Questions,
   ...apstaPrednasky,
-  ...testyHypotezPriklady
+  ...testyHypotezPriklady,
+  ...twoChoicePracticeQuestions
 ]
 
 function App() {

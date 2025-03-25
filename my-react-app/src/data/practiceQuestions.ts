@@ -4,6 +4,7 @@ import { advancedConceptsQuestions } from './questions/advancedConcepts';
 import { apstaLecturesQuestions } from './questions/apstaLectures';
 import { practicalTestsQuestions } from './questions/practicalTests';
 import { hypothesisTestingQuestions } from './questions/hypothesisTestingExamples';
+import { twoChoicePracticeQuestions } from './questions/2choice';
 
 export {
   basicConceptsQuestions as cviceni1Questions,
@@ -19,7 +20,8 @@ const allPractices = [
   ...advancedConceptsQuestions,
   ...apstaLecturesQuestions,
   ...practicalTestsQuestions,
-  ...hypothesisTestingQuestions
+  ...hypothesisTestingQuestions,
+  ...twoChoicePracticeQuestions
 ];
 
 export default allPractices; 
