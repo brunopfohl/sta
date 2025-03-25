@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './PracticeSection.module.css';
 import { Practice } from '../../types';
+import { sortCategories } from '../../utils/categoryOrder';
 
 interface PracticeSectionProps {
   practices: Practice[];
@@ -12,18 +13,47 @@ const PracticeSection: React.FC<PracticeSectionProps> = ({ practices }) => {
   const [showExplanation, setShowExplanation] = useState(false);
   const [score, setScore] = useState(0);
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<number>>(new Set());
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [completedCategories, setCompletedCategories] = useState<Set<string>>(new Set());
+  const [showRoadmap, setShowRoadmap] = useState(true);
 
-  // Get unique categories
-  const categories = ['all', ...new Set(practices.map(p => p.category))];
+  // Get unique categories and sort them in order of progression
+  const uniqueCategories = [...new Set(practices.map(p => p.category))];
+  const categories = sortCategories(uniqueCategories);
   
   // Filter questions by category
-  const filteredPractices = selectedCategory === 'all' 
-    ? practices 
-    : practices.filter(p => p.category === selectedCategory);
+  const filteredPractices = selectedCategory 
+    ? practices.filter(p => p.category === selectedCategory)
+    : [];
 
   const currentQuestion = filteredPractices[currentQuestionIndex];
-  const progress = (answeredQuestions.size / filteredPractices.length) * 100;
+  const progress = filteredPractices.length > 0
+    ? (answeredQuestions.size / filteredPractices.length) * 100
+    : 0;
+
+  // Check if category is completed
+  useEffect(() => {
+    if (selectedCategory && answeredQuestions.size === filteredPractices.length && filteredPractices.length > 0) {
+      setCompletedCategories(prev => new Set([...prev, selectedCategory]));
+      
+      // Save completed categories to localStorage
+      const updatedCompletedCategories = new Set([...completedCategories, selectedCategory]);
+      localStorage.setItem('completedCategories', JSON.stringify([...updatedCompletedCategories]));
+    }
+  }, [answeredQuestions, selectedCategory, filteredPractices.length, completedCategories]);
+
+  // Load completed categories from localStorage on mount
+  useEffect(() => {
+    const savedCompletedCategories = localStorage.getItem('completedCategories');
+    if (savedCompletedCategories) {
+      try {
+        const parsedCategories = JSON.parse(savedCompletedCategories);
+        setCompletedCategories(new Set(parsedCategories));
+      } catch (error) {
+        console.error('Error parsing completed categories:', error);
+      }
+    }
+  }, []);
 
   const handleAnswerSelect = (answer: string) => {
     if (answeredQuestions.has(currentQuestionIndex)) return;
@@ -54,13 +84,19 @@ const PracticeSection: React.FC<PracticeSectionProps> = ({ practices }) => {
     }
   };
 
-  const handleCategoryChange = (category: string) => {
+  const handleCategorySelect = (category: string) => {
     setSelectedCategory(category);
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);
     setShowExplanation(false);
     setScore(0);
     setAnsweredQuestions(new Set());
+    setShowRoadmap(false);
+  };
+
+  const handleBackToRoadmap = () => {
+    setSelectedCategory(null);
+    setShowRoadmap(true);
   };
 
   const getOptionClassName = (option: string) => {
@@ -79,22 +115,70 @@ const PracticeSection: React.FC<PracticeSectionProps> = ({ practices }) => {
     return styles.optionButton;
   };
 
+  if (showRoadmap) {
+    // Calculate overall progress
+    const totalCategoriesCount = categories.length;
+    const completedCategoriesCount = completedCategories.size;
+    const overallProgress = totalCategoriesCount > 0
+      ? (completedCategoriesCount / totalCategoriesCount) * 100
+      : 0;
+
+    return (
+      <div className={styles.practiceContainer}>
+        <h2 className={styles.roadmapTitle}>Roadmap cvičení</h2>
+        <p className={styles.roadmapDescription}>
+          Procházejte kategorie od základních konceptů k pokročilejším. 
+          Již dokončené kategorie jsou označeny jako splněné.
+        </p>
+        
+        <div className={styles.overallProgressContainer}>
+          <div className={styles.overallProgressLabel}>
+            Celkový pokrok: {completedCategoriesCount} / {totalCategoriesCount} kategorií
+          </div>
+          <div className={styles.overallProgressBar}>
+            <div 
+              className={styles.overallProgressFill} 
+              style={{ width: `${overallProgress}%` }}
+            />
+          </div>
+        </div>
+        
+        <div className={styles.roadmap}>
+          {categories.map((category, index) => (
+            <div 
+              key={category} 
+              className={`${styles.roadmapItem} ${completedCategories.has(category) ? styles.completed : ''}`}
+              onClick={() => handleCategorySelect(category)}
+            >
+              <div className={styles.roadmapNumber}>{index + 1}</div>
+              <div className={styles.roadmapContent}>
+                <h3 className={styles.roadmapCategory}>{category}</h3>
+                <p className={styles.roadmapStatus}>
+                  {completedCategories.has(category) ? 'Dokončeno ✓' : 'Nedokončeno'}
+                </p>
+                <div className={styles.roadmapCount}>
+                  {practices.filter(p => p.category === category).length} otázek
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.practiceContainer}>
-      <div className={styles.categorySelector}>
-        <label htmlFor="category">Vyberte kategorii:</label>
-        <select 
-          id="category"
-          value={selectedCategory}
-          onChange={(e) => handleCategoryChange(e.target.value)}
-          className={styles.categorySelect}
+      <div className={styles.practiceHeader}>
+        <button 
+          className={styles.backButton}
+          onClick={handleBackToRoadmap}
         >
-          {categories.map(category => (
-            <option key={category} value={category}>
-              {category === 'all' ? 'Všechny kategorie' : category}
-            </option>
-          ))}
-        </select>
+          ← Zpět na roadmap
+        </button>
+        <h2 className={styles.categoryTitle}>
+          {selectedCategory}
+        </h2>
       </div>
 
       <div className={styles.progressBar}>
@@ -108,68 +192,74 @@ const PracticeSection: React.FC<PracticeSectionProps> = ({ practices }) => {
         Skóre: {score} / {filteredPractices.length}
       </div>
 
-      <div className={styles.questionCard}>
-        <div className={styles.questionMeta}>
-          <div className={styles.questionType}>
-            {currentQuestion.type === 'multiple-choice' ? 'Výběr z možností' : 'Teoretická otázka'}
+      {filteredPractices.length > 0 ? (
+        <div className={styles.questionCard}>
+          <div className={styles.questionMeta}>
+            <div className={styles.questionType}>
+              {currentQuestion.type === 'multiple-choice' ? 'Výběr z možností' : 'Teoretická otázka'}
+            </div>
+            <div className={styles.questionCategory}>
+              {currentQuestion.category}
+            </div>
           </div>
-          <div className={styles.questionCategory}>
-            {currentQuestion.category}
-          </div>
-        </div>
-        
-        <h3 className={styles.questionHeader}>
-          {currentQuestion.question}
-        </h3>
-
-        {currentQuestion.type === 'multiple-choice' && currentQuestion.options && (
-          <div className={styles.optionsContainer}>
-            {currentQuestion.options.map((option, index) => (
-              <button
-                key={index}
-                className={getOptionClassName(option)}
-                onClick={() => handleAnswerSelect(option)}
-                disabled={answeredQuestions.has(currentQuestionIndex)}
-              >
-                {option}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {currentQuestion.type === 'theory' && (
-          <div 
-            className={styles.theoryAnswer}
-            onClick={() => !answeredQuestions.has(currentQuestionIndex) && handleAnswerSelect(currentQuestion.correctAnswer)}
-          >
-            {showExplanation ? currentQuestion.correctAnswer : 'Klikněte pro zobrazení odpovědi'}
-          </div>
-        )}
-
-        {showExplanation && (
-          <div className={styles.explanation}>
-            <strong>Vysvětlení:</strong> {currentQuestion.explanation}
-          </div>
-        )}
-
-        <div className={styles.navigationButtons}>
-          <button
-            className={styles.navButton}
-            onClick={handlePreviousQuestion}
-            disabled={currentQuestionIndex === 0}
-          >
-            ← Předchozí
-          </button>
           
-          <button
-            className={styles.navButton}
-            onClick={handleNextQuestion}
-            disabled={currentQuestionIndex === filteredPractices.length - 1}
-          >
-            Další →
-          </button>
+          <h3 className={styles.questionHeader}>
+            {currentQuestion.question}
+          </h3>
+
+          {currentQuestion.type === 'multiple-choice' && currentQuestion.options && (
+            <div className={styles.optionsContainer}>
+              {currentQuestion.options.map((option, index) => (
+                <button
+                  key={index}
+                  className={getOptionClassName(option)}
+                  onClick={() => handleAnswerSelect(option)}
+                  disabled={answeredQuestions.has(currentQuestionIndex)}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {currentQuestion.type === 'theory' && (
+            <div 
+              className={styles.theoryAnswer}
+              onClick={() => !answeredQuestions.has(currentQuestionIndex) && handleAnswerSelect(currentQuestion.correctAnswer)}
+            >
+              {showExplanation ? currentQuestion.correctAnswer : 'Klikněte pro zobrazení odpovědi'}
+            </div>
+          )}
+
+          {showExplanation && (
+            <div className={styles.explanation}>
+              <strong>Vysvětlení:</strong> {currentQuestion.explanation}
+            </div>
+          )}
+
+          <div className={styles.navigationButtons}>
+            <button
+              className={styles.navButton}
+              onClick={handlePreviousQuestion}
+              disabled={currentQuestionIndex === 0}
+            >
+              ← Předchozí
+            </button>
+            
+            <button
+              className={styles.navButton}
+              onClick={handleNextQuestion}
+              disabled={currentQuestionIndex === filteredPractices.length - 1}
+            >
+              Další →
+            </button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className={styles.emptyState}>
+          <p>Žádné otázky v této kategorii</p>
+        </div>
+      )}
     </div>
   );
 };

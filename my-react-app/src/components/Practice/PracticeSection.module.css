@@ -299,4 +299,218 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+/* Roadmap Styles */
+.roadmapTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2D3748;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.roadmapDescription {
+  text-align: center;
+  color: #4A5568;
+  max-width: 700px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.5;
+}
+
+.roadmap {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.roadmapItem {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  border-left: 5px solid #E2E8F0;
+}
+
+.roadmapItem:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+.roadmapItem.completed {
+  border-left: 5px solid #48BB78;
+}
+
+.roadmapItem:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  bottom: -1.25rem;
+  left: 1.75rem;
+  width: 2px;
+  height: 1.25rem;
+  background-color: #E2E8F0;
+  z-index: 1;
+}
+
+.roadmapItem.completed:not(:last-child)::after {
+  background-color: #48BB78;
+}
+
+.roadmapNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: #EBF8FF;
+  color: #2B6CB0;
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-right: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.roadmapItem.completed .roadmapNumber {
+  background: #48BB78;
+  color: white;
+}
+
+/* Show a lock icon on categories that should be completed in order */
+.roadmapItem:not(:nth-child(1)):not(.completed) .roadmapNumber::after {
+  content: '🔒';
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  font-size: 0.875rem;
+  background: #F7FAFC;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #E2E8F0;
+}
+
+/* Unlock the next item after the previous one is completed */
+.roadmapItem:nth-child(2) .roadmapNumber::after {
+  display: none;
+}
+
+.roadmapItem.completed + .roadmapItem .roadmapNumber::after {
+  display: none;
+}
+
+.roadmapContent {
+  flex: 1;
+}
+
+.roadmapCategory {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2D3748;
+  margin-bottom: 0.25rem;
+}
+
+.roadmapStatus {
+  font-size: 0.875rem;
+  color: #4A5568;
+  margin-bottom: 0.5rem;
+}
+
+.roadmapItem.completed .roadmapStatus {
+  color: #48BB78;
+  font-weight: 500;
+}
+
+.roadmapCount {
+  font-size: 0.875rem;
+  color: #718096;
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: #F7FAFC;
+  border-radius: 20px;
+}
+
+/* Practice Screen Styles */
+.practiceHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.backButton {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: #4299E1;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.backButton:hover {
+  background: #3182CE;
+}
+
+.categoryTitle {
+  margin-left: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2D3748;
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.emptyState {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  text-align: center;
+  color: #718096;
+  font-size: 1.125rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Overall Progress Tracker */
+.overallProgressContainer {
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  text-align: center;
+}
+
+.overallProgressLabel {
+  font-size: 1rem;
+  color: #4A5568;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.overallProgressBar {
+  width: 100%;
+  height: 8px;
+  background: #E2E8F0;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.overallProgressFill {
+  height: 100%;
+  background: linear-gradient(to right, #48BB78, #38B2AC);
+  border-radius: 4px;
+  transition: width 0.5s ease;
 } 
